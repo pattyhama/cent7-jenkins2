@@ -4,7 +4,17 @@ require 'rake'
 require 'rspec/core/rake_task'
 
 task spec: 'spec:all'
-task default: [:spec]
+task default: [:spec, :foodcritic]
+
+desc 'foodcritic'
+task :foodcritic do |_t|
+  if Gem::Version.new('1.9.2') <= Gem::Version.new(RUBY_VERSION.dup)
+    # "FC008: Generated cookbook metadata needs updating" is for handson
+    sh "foodcritic -f any #{File.dirname(__FILE__)}"
+  else
+    puts "WARN: foodcritic run is skipped as Ruby #{RUBY_VERSION} is < 1.9.2."
+  end
+end
 
 namespace :spec do
   targets = []
