@@ -9,5 +9,6 @@ rvm:
 cache: bundler
 before_script:
 - docker build --no-cache -t pattyhama/cent7-jenkins2:1.0 .
+- docker images
 - docker run --privileged -d --name $TARGET_CONTAINER_ID pattyhama/cent7-jenkins2:1.0
 - docker ps -a
