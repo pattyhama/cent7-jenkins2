@@ -8,5 +8,4 @@ gem 'rake'
 gem 'docker-api'
 
 # for syntax check
-gem 'foodcritic', '6.3.0'
 gem 'rubocop', '0.41.1'
