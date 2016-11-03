@@ -10,5 +10,5 @@ cache: bundler
 before_script:
 - docker build --no-cache -t melody .
 - docker images
-- docker run -d --name $TARGET_CONTAINER_ID melody
+- docker run --privileged -d --name $TARGET_CONTAINER_ID melody
 - docker ps -a
