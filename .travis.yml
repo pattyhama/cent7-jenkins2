@@ -10,8 +10,22 @@ cache: bundler
 env:
   matrix:
   - TARGET_CONTAINER_ID=melody
+  global:
+  - secure: gb8BvYAhx7ofDpCIQMuIY+jPqvi7eFORLoQPFNJ/nDkbXbhIoYlm6CSmuH87LUy+NkCFMlRTS3vraHCmjEPT0J1vhnzVo9uQYTnHGx7lvlvx3kU1xf5rrVrc5nhwXMceyYSl7pF7tmiepPr27OvoothgB+ID2jJgKP2KO4fJz6BQ6mHRwRdboZL5vx4InChtUQvvIdujl2DPA8Kz6M+YrURYLMOjf9tT0Pu0qCyO4fp26zlOUC18gFIqZxnzz0usIH6yCh0Up3CEpjj5fIvuUbZSpN6BHci15xe8cierYgM4Lew1DFSALv2RoMeIBFmoc5+WM3J1YywlzFaszZKzlKcRVvdDU1D5kBJJ3tvmDiZPzjmofaT2vKTBKaTfwYzsaxQJEb64ulWKu0NVO+MB7kz65vTRkXaXDXVZPnbFaFcliLimsSus1yF5od+pCRtfc0z5jcQ6k4cQGwCAY73G2mFr6mYY52KFRqtfXklR/BrkVGO+VtQyYcv7/2+lkW8Qg/yYCSebrFD5rjLWjSmI1Zp50RXN/x/Q2y0ZsG7Jrt9bfwkL8PdFmanj5fATwuhzA0z8lyTLvAlDzjPc9XtvL0fo5IStHlzNvnRDuW2losTnd2eqWJ2lnZDumbSbwznSX38u93eOYyKJjkO2BLirekMIBd3syeQEA82g9nOgmjQ=
+  - secure: h6FFomzNF/aIAFaClaUojcMkCtdZqhGXK8qpJAs6BBrcm9uouNCeKsuUL1EPhl1fRQRRxfd6hKjRShT56fG/60kTAgBE/KJO65I0TqxpoflFMgo33H40eE0gM2z/dXrLE5cwLqEvK7ugwLVT9bYF06Mi2GRBO065vhnc1ZtK9S5BNFGIoO5qPWDRI2MW7V9MMhz28RH6lCkxx179DAfTFPs/fr785g+Cvciu5fGCxcXrnbsbQ3qyjGycinsYhX5+XRNSMXdog5gfYjj+/mdMih713Car/SsAnMbiiNpniicXrdLKXO51MHcCP9aaAtLUouj4Vv/cSEK4gNMlX8Lz0a95bs4srsl9buCHG8SRy0+RW6N9KN1Z5jrxH2zWtnV6tr/gNSe068Lj+3LDnImf9o2nN+UK9YsMdt8AE+01oOKh5GK/EbUcqHhRntEiCHQ59JFiKmUhBMtjDumwdHy8mi2yksLjdvVs3bK9oXbdT1FSh6fZM+sKLjBALjF6WwLeNNx/7ffq/BUB8j1W/IszXWQ+rKsYqR9+nR2PlGx40PMMFbN72Gx9e0Xo8G355htnUY8WUXE5Bl270KCpWRJ8JOB4sJZeShM66CHuA3BDaWOtM6hgptZbYLzbQkMEdzyA67cbXctpSDcnMys36lJOr6l8zY74tgiA/tmw0ztkYz4=
+  - secure: kC3h6XE1n3gjlEq1g/RxzPjNjg71KhEU+paeOpjsjcg1/muiH9Lc4tmJ6kfftNxBQuQ/faWWKrdfgmckOCTz96i9m/teVDTEpLq0MLfJZvQ7Evt846/cknE3tcM/pvtte16MH4E4mChV3qoHozyt6MpJ25/409YgGvWx7BwbU7i593/D0aaRrccYbgFse+yQi2h9EpKfgqC1b7c3iw3NGEVuWYDOFuiiNEbYc3sKQfvZN3BG+BJB9XQENpK+OosknyWnOIHduXz8wOKLbEIw9pdXh9HS8t6OfCfMWu+O5/53Aw1/veDwXDoGLHV5M3eNCmKxfzFr5wUlr77rguHqttXssH5FhH60QkkqW9NF8kyuIIYaJCP4yRuKq4FSRaSYsstO5FpgOUV06W45Aa41o4L4+7/HETIy+nJasjAywB0AgeubRnKrmePo34ZH8juhi7yAPne2sHxLmVJVqT9dUxC8StP5eVLy0Jy8HehzMA9tz93rHr+/Z/jD3wfi7bZrSun1v/JzVX6F2/Ks3Oz+Xyc3ztxE81G9e9qkYHkMIiaHVLI3W7tT7jRJ0HYOEN72vVkeWe72wtL6l2SJGNi5Vdj7rZklUEc//fUA/qNgRpdQXGS6b83pDJbCOSSxM0UO1TfzNF1hgtdPhNKkzlLMI5oRYnMA0lDpjU93liUI6+Y=
+  # Add an environment variable containing the 8 first characters of the git commit hash.
+  - COMMIT=${TRAVIS_COMMIT::8}
 before_script:
 - docker build --no-cache -t melody .
 - docker images
 - docker run -d --name $TARGET_CONTAINER_ID melody
 - docker ps -a
+after_success:
+ - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+ - export REPO=pattyhama/centos7-jenkins2
+ - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+ - docker build -f Dockerfile -t $REPO:$COMMIT .
+ - docker tag $REPO:$COMMIT $REPO:$TAG
+ - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
+ - docker push $REPO
