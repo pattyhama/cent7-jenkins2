@@ -7,3 +7,5 @@ services:
 rvm:
 - 2.1
 cache: bundler
+before_install:
+- gem update bundler
