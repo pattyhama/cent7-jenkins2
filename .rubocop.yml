@@ -1,0 +1,14 @@
+# This is the configuration used to check the rubocop source code.
+# Ref: https://github.com/bbatsov/rubocop
+# Ref: http://rochefort.hatenablog.com/entry/2014/08/14/073000
+
+AllCops:
+  Exclude:
+    - 'vendor/**/*'
+
+Lint/AmbiguousRegexpLiteral:
+  Enabled: false
+
+# Disable "Line is too long"
+Metrics/LineLength:
+  Enabled: false
