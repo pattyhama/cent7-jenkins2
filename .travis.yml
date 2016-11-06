@@ -20,6 +20,8 @@ before_script:
 - docker images
 - docker run -d --name $TARGET_CONTAINER_ID melody
 - docker ps -a
+script:
+- bundle exec rspec spec/melody/*.rb
 after_success:
 - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
 - export REPO=pattyhama/cent7-jenkins2
